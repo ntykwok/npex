@@ -1,13 +1,21 @@
-# Sample Hardhat Project
+# ISOM 3000H Final Project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
+## Backend
+It comes with a project NPEX contract, a test for that contract, and a script that deploys that contract.
+Try running the following tasks for testing and setting up the project
 
 ```shell
-npx hardhat help
+npm i 
 npx hardhat test
-REPORT_GAS=true npx hardhat test
 npx hardhat node
 npx hardhat run scripts/deploy.js
+```
+## Frontend
+It comes with a frontend interacting with NPEX contract
+Try running the following tasks for setting up the project in your local host
+
+```shell
+cd frontend
+npm i
+npm run start
 ```
