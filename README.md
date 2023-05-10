@@ -12,8 +12,9 @@ npx hardhat run scripts/deploy.js
 ```
 ## Frontend
 It comes with a frontend interacting with NPEX contract
+You can find the frontend file in https://github.com/ntykwok/npex-frontend
+download and put inside the frontend folder of NPEX
 Try running the following tasks for setting up the project in your local host
-
 ```shell
 cd frontend
 npm i

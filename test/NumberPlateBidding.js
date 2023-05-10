@@ -9,7 +9,7 @@ describe("NumberPlateAuction", () => {
 
   beforeEach(async () => {
     NumberPlateAuction = await ethers.getContractFactory("NumberPlateAuction");
-    [owner, addr1, addr2, _] = await ethers.getSigners();
+    [owner, addr1, addr2, addr3, _] = await ethers.getSigners();
     numberPlateAuction = await NumberPlateAuction.deploy();
     await numberPlateAuction.deployed();
   });
@@ -164,5 +164,65 @@ describe("NumberPlateAuction", () => {
         numberPlateAuction.connect(addr2).setDestination(numberPlate, destination)
       ).to.be.revertedWith("Caller is not owner nor approved.");
     });
+  });
+  describe("getAuctionData", () => {
+    beforeEach(async () => {
+      await numberPlateAuction.connect(addr1).createNumberPlate(numberPlate, { value: minCreationFee });
+    });
+  
+    it("should return auction data for number plates", async () => {
+      const auctionData = await numberPlateAuction.getAuctionData();
+      expect(auctionData.length).to.equal(1);
+      expect(auctionData[0].numberPlate).to.equal(numberPlate);
+      expect(auctionData[0].highestBid).to.equal(minCreationFee);
+    });
+  });
+  
+  describe("getForSaleData", () => {
+    beforeEach(async () => {
+      await numberPlateAuction.connect(addr1).createNumberPlate(numberPlate, { value: minCreationFee });
+      await numberPlateAuction.connect(addr1).setForSale(numberPlate, minCreationFee);
+    });
+  
+    it("should return for sale data for number plates", async () => {
+      const forSaleData = await numberPlateAuction.getForSaleData();
+      expect(forSaleData.length).to.equal(1);
+      expect(forSaleData[0].numberPlate).to.equal(numberPlate);
+      expect(forSaleData[0].price).to.equal(minCreationFee);
+    });
+  });
+  describe("removeFromSale", () => {
+    beforeEach(async () => {
+      await numberPlateAuction.connect(addr1).createNumberPlate(numberPlate, { value: minCreationFee });
+      await numberPlateAuction.connect(addr1).setForSale(numberPlate, minCreationFee);
+    });
+  
+    it("should remove a number plate from sale", async () => {
+      const tokenId = ethers.BigNumber.from(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(numberPlate)));
+      await numberPlateAuction.connect(addr1).removeFromSale(numberPlate);
+  
+      const numberPlateData = await numberPlateAuction.numberPlates(tokenId);
+      expect(numberPlateData.forSale).to.equal(false);
+      expect(numberPlateData.price).to.equal(minCreationFee);
+    });
+  
+    it("should revert if caller is not owner nor approved", async () => {
+      await expect(
+        numberPlateAuction.connect(addr2).removeFromSale(numberPlate)
+      ).to.be.revertedWith("Caller is not owner nor approved.");
+    });
   }); 
+  describe("placeBid", () => {
+    beforeEach(async () => {
+      await numberPlateAuction.connect(addr1).createNumberPlate(numberPlate, { value: minCreationFee });
+    });
+  
+    it("should revert if bid is lower than the current highest bid", async () => {
+      await numberPlateAuction.connect(addr2).bidOnAuction(numberPlate, { value: minCreationFee.mul(2) });
+  
+      await expect(
+        numberPlateAuction.connect(addr3).bidOnAuction(numberPlate, { value: minCreationFee })
+      ).to.be.revertedWith("Bid must be higher than the current highest bid.");
+    });
+  });
 });
