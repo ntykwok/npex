@@ -34,7 +34,7 @@ contract NumberPlateAuction is ERC721 {
         uint256 price;
     }
 
-    uint256 private auctionDuration = 3 minutes;
+    uint256 private auctionDuration = 1 minutes;
     uint256 private constant minCreationFee = 1000000000000000; // 1 Finney
     uint256 private constant minBid = 1000000000000000; // 1 Finney
     uint256 private constant commissionPercentage = 1;
